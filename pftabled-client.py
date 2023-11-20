@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/local/bin/python3
 #
 # Copyright (c) 2010 Armin Wolfermann <armin@wolfermann.org>
 #
@@ -16,14 +16,15 @@
 #
 import hmac
 import re
-import sha
+#import sha
+import hashlib
 import socket
 import struct
 import sys
 import time
 
 if len(sys.argv) < 5:
-    print "usage: pftabled-client.py host port table cmd [ip] [key]"
+    print("usage: pftabled-client.py host port table cmd [ip] [key]")
     sys.exit(1)
 
 host = sys.argv[1]
@@ -38,7 +39,7 @@ if len(sys.argv) > 5:
     m = re.search('([\d\.]+)/(\d+)', addr)
     if m:
         addr = m.group(1)
-	netmask = int(m.group(2))
+        netmask = int(m.group(2))
 
 key = ''
 if len(sys.argv) > 6:
@@ -46,7 +47,7 @@ if len(sys.argv) > 6:
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 msg = struct.pack("BBxB4s32sI", 2, command, netmask, socket.inet_aton(addr), table, socket.htonl(int(time.time())) & 0xFFFFFFFF)
+sha = hashlib.sha1()
 msg = msg + hmac.new(key, msg, digestmod=sha).digest()
 s.sendto(msg, (host, port))
 s.close()
-
